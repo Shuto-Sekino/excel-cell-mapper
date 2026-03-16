@@ -17,23 +17,29 @@
 
 **スキーマ:**
 
-```typescript
-const schema = {
-  name: 'B1',
-  age: 'B2',
-  email: 'B3',
-  department: 'B4',
-};
+```python
+from excel_cell_mapper import ExcelMapper
+
+mapper = ExcelMapper("data.xlsx")
+
+schema = {
+    "name": "B1",
+    "age": "B2",
+    "email": "B3",
+    "department": "B4",
+}
+
+result = mapper.map(schema)
 ```
 
 **出力:**
 
-```json
+```python
 {
-  "name": "山田太郎",
-  "age": 30,
-  "email": "yamada@example.com",
-  "department": "営業部"
+    "name": "山田太郎",
+    "age": 30,
+    "email": "yamada@example.com",
+    "department": "営業部",
 }
 ```
 
@@ -51,27 +57,29 @@ const schema = {
 
 **スキーマ（A列のセル値をキーに使用）:**
 
-```typescript
-const schema = {
-  'A1': 'B1',
-  'A2': 'B2',
-  'A3': 'B3',
-};
+```python
+schema = {
+    "A1": "B1",
+    "A2": "B2",
+    "A3": "B3",
+}
+
+result = mapper.map(schema)
 ```
 
 **出力:**
 
-```json
+```python
 {
-  "name": "山田太郎",
-  "age": 30,
-  "email": "yamada@example.com"
+    "name": "山田太郎",
+    "age": 30,
+    "email": "yamada@example.com",
 }
 ```
 
 ---
 
-## 例3: ネストしたオブジェクト（住所情報）
+## 例3: ネストしたdict（住所情報）
 
 **Excelレイアウト:**
 
@@ -85,35 +93,37 @@ const schema = {
 
 **スキーマ:**
 
-```typescript
-const schema = {
-  name: 'B1',
-  address: {
-    prefecture: 'B2',
-    city: 'B3',
-    zip: 'B4',
-  },
-  phone: 'B5',
-};
+```python
+schema = {
+    "name": "B1",
+    "address": {
+        "prefecture": "B2",
+        "city": "B3",
+        "zip": "B4",
+    },
+    "phone": "B5",
+}
+
+result = mapper.map(schema)
 ```
 
 **出力:**
 
-```json
+```python
 {
-  "name": "山田太郎",
-  "address": {
-    "prefecture": "東京都",
-    "city": "渋谷区",
-    "zip": "150-0002"
-  },
-  "phone": "03-1234-5678"
+    "name": "山田太郎",
+    "address": {
+        "prefecture": "東京都",
+        "city": "渋谷区",
+        "zip": "150-0002",
+    },
+    "phone": "03-1234-5678",
 }
 ```
 
 ---
 
-## 例4: 配列（品目リスト）
+## 例4: リスト（品目一覧）
 
 **Excelレイアウト:**
 
@@ -127,23 +137,25 @@ const schema = {
 
 **スキーマ:**
 
-```typescript
-const schema = {
-  fruits: ['A1:A5'],
-};
+```python
+schema = {
+    "fruits": ["A1:A5"],
+}
+
+result = mapper.map(schema)
 ```
 
 **出力:**
 
-```json
+```python
 {
-  "fruits": ["りんご", "みかん", "ぶどう", "もも", "なし"]
+    "fruits": ["りんご", "みかん", "ぶどう", "もも", "なし"],
 }
 ```
 
 ---
 
-## 例5: オブジェクト配列（商品テーブル）
+## 例5: dictのリスト（商品テーブル）
 
 **Excelレイアウト:**
 
@@ -154,30 +166,32 @@ const schema = {
 | 3 | 2 | みかん | 80 |
 | 4 | 3 | ぶどう | 200 |
 
-**スキーマ（ヘッダー行を除いたA2:C4をオブジェクト配列に変換）:**
+**スキーマ（ヘッダー行を除いたA2:C4をdictのリストに変換）:**
 
-```typescript
-const schema = {
-  products: {
-    $range: 'A2:C4',
-    $schema: {
-      id: 0,
-      name: 1,
-      price: 2,
+```python
+schema = {
+    "products": {
+        "$range": "A2:C4",
+        "$schema": {
+            "id": 0,
+            "name": 1,
+            "price": 2,
+        },
     },
-  },
-};
+}
+
+result = mapper.map(schema)
 ```
 
 **出力:**
 
-```json
+```python
 {
-  "products": [
-    { "id": 1, "name": "りんご", "price": 100 },
-    { "id": 2, "name": "みかん", "price": 80 },
-    { "id": 3, "name": "ぶどう", "price": 200 }
-  ]
+    "products": [
+        {"id": 1, "name": "りんご", "price": 100},
+        {"id": 2, "name": "みかん", "price": 80},
+        {"id": 3, "name": "ぶどう", "price": 200},
+    ],
 }
 ```
 
@@ -191,35 +205,37 @@ const schema = {
 
 **スキーマ:**
 
-```typescript
-const schema = {
-  customer: {
-    id: '顧客情報!B1',
-    name: '顧客情報!B2',
-    email: '顧客情報!B3',
-  },
-  order: {
-    orderId: '注文情報!B1',
-    date: '注文情報!B2',
-    total: '注文情報!B5',
-  },
-};
+```python
+schema = {
+    "customer": {
+        "id": "顧客情報!B1",
+        "name": "顧客情報!B2",
+        "email": "顧客情報!B3",
+    },
+    "order": {
+        "order_id": "注文情報!B1",
+        "date": "注文情報!B2",
+        "total": "注文情報!B5",
+    },
+}
+
+result = mapper.map(schema)
 ```
 
 **出力:**
 
-```json
+```python
 {
-  "customer": {
-    "id": "C-001",
-    "name": "山田太郎",
-    "email": "yamada@example.com"
-  },
-  "order": {
-    "orderId": "ORD-2024-001",
-    "date": "2024-01-15T00:00:00.000Z",
-    "total": 15000
-  }
+    "customer": {
+        "id": "C-001",
+        "name": "山田太郎",
+        "email": "yamada@example.com",
+    },
+    "order": {
+        "order_id": "ORD-2024-001",
+        "date": datetime.datetime(2024, 1, 15, 0, 0),
+        "total": 15000,
+    },
 }
 ```
 
@@ -229,85 +245,95 @@ const schema = {
 
 セル値を取得後に加工したい場合はトランスフォーマーを使います。
 
-```typescript
-import { ExcelMapper } from 'excel-cell-mapper';
+```python
+from excel_cell_mapper import ExcelMapper, CellContext, CellValue
 
-const mapper = new ExcelMapper('./data.xlsx', {
-  transform: (value, { cellRef }) => {
-    // 数値は小数点2桁に丸める
-    if (typeof value === 'number') {
-      return Math.round(value * 100) / 100;
-    }
-    // 文字列は前後の空白を除去
-    if (typeof value === 'string') {
-      return value.trim();
-    }
-    return value;
-  },
-});
+def my_transform(value: CellValue, context: CellContext) -> object:
+    # 数値は小数点2桁に丸める
+    if isinstance(value, float):
+        return round(value, 2)
+    # 文字列は前後の空白を除去
+    if isinstance(value, str):
+        return value.strip()
+    return value
 
-const result = await mapper.map({ price: 'B3' });
+mapper = ExcelMapper("data.xlsx", transform=my_transform)
+result = mapper.map({"price": "B3"})
 ```
 
 ---
 
-## 例8: Node.jsでのファイル読み込み
+## 例8: ファイルパスからの読み込み（典型的な使い方）
 
-```typescript
-import { ExcelMapper } from 'excel-cell-mapper';
+```python
+from pathlib import Path
+from excel_cell_mapper import ExcelMapper
 
-async function processOrderForm(filePath: string) {
-  const mapper = await ExcelMapper.fromFile(filePath, {
-    defaultSheet: '注文書',
-    emptyCell: 'omit',
-    dateFormat: 'iso',
-  });
+def process_order_form(file_path: str | Path) -> dict:
+    mapper = ExcelMapper(
+        file_path,
+        default_sheet="注文書",
+        empty_cell="omit",
+        date_format="iso",
+    )
 
-  const schema = {
-    orderId: 'B1',
-    customer: {
-      name: 'B3',
-      address: 'B4',
-      phone: 'B5',
-    },
-    items: {
-      $range: 'A9:D20',
-      $schema: { name: 0, quantity: 1, unitPrice: 2, subtotal: 3 },
-      $skipEmpty: true,
-    },
-    totalAmount: 'D22',
-  };
+    schema = {
+        "order_id": "B1",
+        "customer": {
+            "name": "B3",
+            "address": "B4",
+            "phone": "B5",
+        },
+        "items": {
+            "$range": "A9:D20",
+            "$schema": {"name": 0, "quantity": 1, "unit_price": 2, "subtotal": 3},
+            "$skip_empty": True,
+        },
+        "total_amount": "D22",
+    }
 
-  return await mapper.map(schema);
-}
+    return mapper.map(schema)
 ```
 
 ---
 
-## 例9: ブラウザ環境（File API経由）
+## 例9: コンテキストマネージャーとして使用
 
-```typescript
-import { ExcelMapper } from 'excel-cell-mapper';
+```python
+from excel_cell_mapper import ExcelMapper
 
-async function handleFileUpload(file: File) {
-  const buffer = await file.arrayBuffer();
-  const mapper = new ExcelMapper(buffer);
-
-  const schema = {
-    title: 'A1',
-    data: {
-      $range: 'A3:B10',
-      $schema: { label: 0, value: 1 },
+schema = {
+    "title": "A1",
+    "data": {
+        "$range": "A3:B10",
+        "$schema": {"label": 0, "value": 1},
     },
-  };
-
-  const result = await mapper.map(schema);
-  console.log(result);
 }
 
-// HTML input[type=file] と連携
-document.getElementById('upload')?.addEventListener('change', (e) => {
-  const file = (e.target as HTMLInputElement).files?.[0];
-  if (file) handleFileUpload(file);
-});
+with ExcelMapper("report.xlsx") as mapper:
+    result = mapper.map(schema)
+
+print(result)
+```
+
+---
+
+## 例10: バイナリデータからの読み込み（Web APIなど）
+
+```python
+# FastAPIでのアップロード処理例
+from fastapi import UploadFile
+from excel_cell_mapper import ExcelMapper
+
+async def handle_upload(file: UploadFile) -> dict:
+    content = await file.read()
+
+    mapper = ExcelMapper(content)
+
+    schema = {
+        "name": "B1",
+        "items": ["A2:A10"],
+    }
+
+    return mapper.map(schema)
 ```
