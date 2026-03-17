@@ -5,6 +5,7 @@ Supported formats:
   Single cell:  "A1", "B3", "Sheet1!A1", "顧客情報!B5"
   Range:        "A1:C3", "Sheet1!A1:C3"
 """
+
 from __future__ import annotations
 
 import re
@@ -29,8 +30,8 @@ _BARE_CELL_RE = re.compile(r"^[A-Za-z]+\d+$")  # no sheet prefix
 @dataclass(frozen=True)
 class CellAddress:
     sheet: str | None  # None means "use default sheet"
-    col: int           # 1-based
-    row: int           # 1-based
+    col: int  # 1-based
+    row: int  # 1-based
 
     @property
     def cell_ref(self) -> str:
@@ -60,7 +61,7 @@ def parse_cell_ref(ref: str) -> CellAddress:
     """
     from excel_cell_mapper._exceptions import CellNotFoundError, InvalidSchemaError
 
-    ref_upper = ref.upper()
+    ref.upper()
     # Re-apply the original capitalisation for sheet names
     m = _CELL_RE.match(ref)
     if not m:

@@ -2,6 +2,7 @@
 共有フィクスチャ。
 openpyxl でインメモリの .xlsx ファイルを生成し BytesIO として返す。
 """
+
 import datetime
 from io import BytesIO
 

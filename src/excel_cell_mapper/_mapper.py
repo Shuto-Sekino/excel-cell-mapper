@@ -10,7 +10,6 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 
 from excel_cell_mapper._cell_ref import (
-    CellAddress,
     RangeAddress,
     is_bare_cell_ref,
     parse_cell_ref,
@@ -30,8 +29,8 @@ ExcelSource = str | Path | bytes | BinaryIO
 class CellContext:
     cell_ref: str
     sheet_name: str
-    col_index: int   # 0-based
-    row_index: int   # 0-based
+    col_index: int  # 0-based
+    row_index: int  # 0-based
 
 
 CellTransformer = Callable[[CellValue, CellContext], object]
@@ -196,7 +195,9 @@ class ExcelMapper:
         for row in range(addr.row_start, addr.row_end + 1):
             row_data = []
             for col in range(addr.col_start, addr.col_end + 1):
-                row_data.append(self._cell_value(ws, row, col, f"{get_column_letter(col)}{row}"))
+                row_data.append(
+                    self._cell_value(ws, row, col, f"{get_column_letter(col)}{row}")
+                )
             result.append(row_data)
         return result
 
@@ -206,7 +207,9 @@ class ExcelMapper:
 
     _DIRECTIVES = {"$range", "$schema", "$direction", "$skip_empty"}
 
-    def _resolve_schema(self, schema: object, default_sheet: str | int | None) -> object:
+    def _resolve_schema(
+        self, schema: object, default_sheet: str | int | None
+    ) -> object:
         if isinstance(schema, str):
             return self._resolve_cell_ref_value(schema, default_sheet)
 
@@ -222,7 +225,9 @@ class ExcelMapper:
             f"Schema value must be str, list, or dict. Got: {type(schema).__name__!r}"
         )
 
-    def _resolve_cell_ref_value(self, ref: str, default_sheet: str | int | None) -> CellValue:
+    def _resolve_cell_ref_value(
+        self, ref: str, default_sheet: str | int | None
+    ) -> CellValue:
         addr = parse_cell_ref(ref)
         sheet_name = (
             self._resolve_sheet(addr.sheet)
@@ -239,7 +244,9 @@ class ExcelMapper:
             return ""
         return value
 
-    def _resolve_list_schema(self, schema: list, default_sheet: str | int | None) -> list:
+    def _resolve_list_schema(
+        self, schema: list, default_sheet: str | int | None
+    ) -> list:
         if len(schema) != 1 or not isinstance(schema[0], str):
             raise InvalidSchemaError(
                 "List schema must contain exactly one range reference string. "
@@ -268,7 +275,9 @@ class ExcelMapper:
 
         return flat
 
-    def _resolve_range_schema(self, schema: dict, default_sheet: str | int | None) -> list:
+    def _resolve_range_schema(
+        self, schema: dict, default_sheet: str | int | None
+    ) -> list:
         if "$range" not in schema:
             raise InvalidSchemaError("$schema requires $range to be specified.")
         if "$schema" not in schema:
@@ -340,7 +349,11 @@ class ExcelMapper:
 
             # Dynamic key: both key and value-expression look like bare cell refs
             # AND the resolved value is used, while the key's cell value becomes key name.
-            if is_bare_cell_ref(key) and isinstance(value, str) and is_bare_cell_ref(value):
+            if (
+                is_bare_cell_ref(key)
+                and isinstance(value, str)
+                and is_bare_cell_ref(value)
+            ):
                 actual_key = self._resolve_cell_ref_value(key, default_sheet)
                 actual_key = str(actual_key) if actual_key is not None else key
             else:

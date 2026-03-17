@@ -8,10 +8,9 @@ ExcelMapper の補助APIメソッドに関するテスト。
 - セル値の型変換
 - ソース種別（bytes / Path / BinaryIO）
 """
+
 import datetime
 import io
-import pathlib
-import tempfile
 
 import pytest
 
@@ -104,10 +103,12 @@ class TestGetSheetNames:
 class TestMapMany:
     def test_basic(self, multi_sheet_wb):
         mapper = ExcelMapper(multi_sheet_wb)
-        result = mapper.map_many({
-            "customer": {"id": "顧客情報!B1", "name": "顧客情報!B2"},
-            "order": {"id": "注文情報!B1", "total": "注文情報!B5"},
-        })
+        result = mapper.map_many(
+            {
+                "customer": {"id": "顧客情報!B1", "name": "顧客情報!B2"},
+                "order": {"id": "注文情報!B1", "total": "注文情報!B5"},
+            }
+        )
         assert result == {
             "customer": {"id": "C-001", "name": "山田太郎"},
             "order": {"id": "ORD-001", "total": 15000},
@@ -115,10 +116,12 @@ class TestMapMany:
 
     def test_returns_all_keys(self, simple_wb):
         mapper = ExcelMapper(simple_wb)
-        result = mapper.map_many({
-            "a": {"name": "B1"},
-            "b": {"age": "B2"},
-        })
+        result = mapper.map_many(
+            {
+                "a": {"name": "B1"},
+                "b": {"age": "B2"},
+            }
+        )
         assert set(result.keys()) == {"a", "b"}
 
     def test_map_many_with_sheet_option(self, second_sheet_wb):

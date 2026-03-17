@@ -2,6 +2,7 @@
 エラーハンドリングに関するテスト。
 docs/api/reference.md のエラークラス一覧を全てカバーする。
 """
+
 import pytest
 
 from excel_cell_mapper import (
@@ -124,13 +125,15 @@ class TestInvalidSchemaError:
         """$direction に 'row'/'column' 以外を指定すると InvalidSchemaError。"""
         mapper = ExcelMapper(simple_wb)
         with pytest.raises(InvalidSchemaError):
-            mapper.map({
-                "x": {
-                    "$range": "A1:C3",
-                    "$schema": {"id": 0},
-                    "$direction": "diagonal",  # 不正値
+            mapper.map(
+                {
+                    "x": {
+                        "$range": "A1:C3",
+                        "$schema": {"id": 0},
+                        "$direction": "diagonal",  # 不正値
+                    }
                 }
-            })
+            )
 
     def test_invalid_cell_ref_format(self, simple_wb):
         """不正なセル参照フォーマット（数字のみなど）は InvalidSchemaError。"""

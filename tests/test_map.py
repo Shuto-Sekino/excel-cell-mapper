@@ -1,9 +1,6 @@
 """
 DSL仕様 docs/schema/dsl.md の全パターンをカバーするテスト。
 """
-import datetime
-
-import pytest
 
 from excel_cell_mapper import ExcelMapper
 
