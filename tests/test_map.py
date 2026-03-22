@@ -324,20 +324,24 @@ class TestCellObjectSyntax:
     def test_cell_object_mixed_with_string_ref(self, simple_wb):
         """{"cell": "..."} と文字列参照が同一スキーマ内で混在できる。"""
         mapper = ExcelMapper(simple_wb)
-        result = mapper.map({
-            "指名": {"cell": "B1"},
-            "年齢": "B2",
-        })
+        result = mapper.map(
+            {
+                "指名": {"cell": "B1"},
+                "年齢": "B2",
+            }
+        )
         assert result == {"指名": "山田太郎", "年齢": 30}
 
     def test_cell_object_multiple_fields(self, simple_wb):
         """複数フィールドすべてにセルオブジェクト構文を使える。"""
         mapper = ExcelMapper(simple_wb)
-        result = mapper.map({
-            "name": {"cell": "B1"},
-            "age": {"cell": "B2"},
-            "email": {"cell": "B3"},
-        })
+        result = mapper.map(
+            {
+                "name": {"cell": "B1"},
+                "age": {"cell": "B2"},
+                "email": {"cell": "B3"},
+            }
+        )
         assert result == {
             "name": "山田太郎",
             "age": 30,
@@ -359,12 +363,14 @@ class TestCellObjectSyntax:
     def test_cell_object_nested_inside_dict(self, simple_wb):
         """ネストした dict の中でもセルオブジェクト構文が機能する。"""
         mapper = ExcelMapper(simple_wb)
-        result = mapper.map({
-            "person": {
-                "name": {"cell": "B1"},
-                "age": "B2",
+        result = mapper.map(
+            {
+                "person": {
+                    "name": {"cell": "B1"},
+                    "age": "B2",
+                }
             }
-        })
+        )
         assert result == {"person": {"name": "山田太郎", "age": 30}}
 
     def test_cell_object_with_sheet_prefix_in_cell_key(self, multi_sheet_wb):
@@ -386,16 +392,18 @@ class TestMapManyDeprecated:
     def test_map_replaces_map_many_with_nesting(self, multi_sheet_wb):
         """map() のネストで map_many と同等の結果を得られる。"""
         mapper = ExcelMapper(multi_sheet_wb)
-        result = mapper.map({
-            "customer": {
-                "id": "顧客情報!B1",
-                "name": "顧客情報!B2",
-            },
-            "order": {
-                "id": "注文情報!B1",
-                "total": "注文情報!B5",
-            },
-        })
+        result = mapper.map(
+            {
+                "customer": {
+                    "id": "顧客情報!B1",
+                    "name": "顧客情報!B2",
+                },
+                "order": {
+                    "id": "注文情報!B1",
+                    "total": "注文情報!B5",
+                },
+            }
+        )
         assert result == {
             "customer": {"id": "C-001", "name": "山田太郎"},
             "order": {"id": "ORD-001", "total": 15000},
