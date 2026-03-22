@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "excel-cell-mapper"
 version = "0.1.0"
@@ -5,16 +9,34 @@ description = "Map Excel cells to Python objects using a DSL"
 readme = "README.md"
 requires-python = ">=3.13"
 license = { file = "LICENSE" }
+keywords = ["excel", "xlsx", "mapping", "openpyxl", "dsl"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial :: Spreadsheet",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "openpyxl>=3.1.5",
 ]
 
-[dependency-groups]
+[project.urls]
+Homepage = "https://github.com/shutosekino/excel-cell-mapper"
+Repository = "https://github.com/shutosekino/excel-cell-mapper"
+Issues = "https://github.com/shutosekino/excel-cell-mapper/issues"
+
+[project.optional-dependencies]
 dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.15.6",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/excel_cell_mapper"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
