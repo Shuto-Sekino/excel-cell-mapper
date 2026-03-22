@@ -81,14 +81,6 @@ class ExcelMapper:
             raise InvalidSchemaError("Top-level schema must be a dict.")
         return result
 
-    def map_many(
-        self,
-        schemas: dict[str, object],
-        *,
-        sheet: str | int | None = None,
-    ) -> dict[str, dict]:
-        return {name: self.map(s, sheet=sheet) for name, s in schemas.items()}
-
     def get_cell(self, cell_ref: str) -> CellValue:
         addr = parse_cell_ref(cell_ref)
         ws = self._get_worksheet(addr.sheet or self._default_sheet_name())
@@ -207,6 +199,11 @@ class ExcelMapper:
 
     _DIRECTIVES = {"$range", "$schema", "$direction", "$skip_empty"}
 
+    @staticmethod
+    def _is_cell_object(schema: dict) -> bool:
+        """{"cell": "B1"} や {"cell": "B1", "sheet": "..."} 形式かどうか判定する。"""
+        return "cell" in schema and schema.keys() <= {"cell", "sheet"}
+
     def _resolve_schema(
         self, schema: object, default_sheet: str | int | None
     ) -> object:
@@ -219,11 +216,29 @@ class ExcelMapper:
         if isinstance(schema, dict):
             if "$range" in schema or "$schema" in schema:
                 return self._resolve_range_schema(schema, default_sheet)
+            if self._is_cell_object(schema):
+                return self._resolve_cell_object(schema, default_sheet)
             return self._resolve_dict_schema(schema, default_sheet)
 
         raise InvalidSchemaError(
             f"Schema value must be str, list, or dict. Got: {type(schema).__name__!r}"
         )
+
+    def _resolve_cell_object(
+        self, schema: dict, default_sheet: str | int | None
+    ) -> CellValue:
+        cell_ref: str = schema["cell"]
+        sheet_override = schema.get("sheet")
+        if sheet_override is not None:
+            # sheet キーが明示されている場合はセル参照のシートプレフィックスより優先
+            addr = parse_cell_ref(cell_ref)
+            sheet_name = self._resolve_sheet(sheet_override)
+            ws = self._get_worksheet(sheet_name)
+            value = self._cell_value(ws, addr.row, addr.col, cell_ref)
+            if self._empty_cell == "empty" and value is None:
+                return ""
+            return value
+        return self._resolve_cell_ref_value(cell_ref, default_sheet)
 
     def _resolve_cell_ref_value(
         self, ref: str, default_sheet: str | int | None

@@ -3,7 +3,6 @@ ExcelMapper の補助APIメソッドに関するテスト。
 - get_cell()
 - get_range()
 - get_sheet_names()
-- map_many()
 - コンテキストマネージャー
 - セル値の型変換
 - ソース種別（bytes / Path / BinaryIO）
@@ -95,43 +94,6 @@ class TestGetSheetNames:
         mapper = ExcelMapper(second_sheet_wb)
         names = mapper.get_sheet_names()
         assert names == ["Sheet1", "Sheet2"]
-
-
-# ===========================================================================
-# map_many()
-# ===========================================================================
-class TestMapMany:
-    def test_basic(self, multi_sheet_wb):
-        mapper = ExcelMapper(multi_sheet_wb)
-        result = mapper.map_many(
-            {
-                "customer": {"id": "顧客情報!B1", "name": "顧客情報!B2"},
-                "order": {"id": "注文情報!B1", "total": "注文情報!B5"},
-            }
-        )
-        assert result == {
-            "customer": {"id": "C-001", "name": "山田太郎"},
-            "order": {"id": "ORD-001", "total": 15000},
-        }
-
-    def test_returns_all_keys(self, simple_wb):
-        mapper = ExcelMapper(simple_wb)
-        result = mapper.map_many(
-            {
-                "a": {"name": "B1"},
-                "b": {"age": "B2"},
-            }
-        )
-        assert set(result.keys()) == {"a", "b"}
-
-    def test_map_many_with_sheet_option(self, second_sheet_wb):
-        """sheet オプションが各スキーマに適用される。"""
-        mapper = ExcelMapper(second_sheet_wb)
-        result = mapper.map_many(
-            {"first": {"value": "A1"}},
-            sheet="Sheet2",
-        )
-        assert result["first"]["value"] == "シート2の値"
 
 
 # ===========================================================================
