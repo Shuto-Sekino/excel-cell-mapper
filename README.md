@@ -166,17 +166,6 @@ ExcelMapper(
 Resolve *schema* against the workbook and return a dict.
 `sheet` overrides `default_sheet` for this call only.
 
-### `mapper.map_many(schemas, *, sheet=None) -> dict[str, dict]`
-
-Run multiple schemas in one call:
-
-```python
-results = mapper.map_many({
-    "header": {"title": "A1", "date": "A2"},
-    "body":   {"$range": "A5:C20", "$schema": {"col1": 0, "col2": 1, "col3": 2}},
-})
-```
-
 ### `mapper.get_cell(cell_ref) -> CellValue`
 
 Read a single cell value directly, bypassing any schema:

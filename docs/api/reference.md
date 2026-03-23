@@ -94,31 +94,6 @@ def map(
 
 ---
 
-### `mapper.map_many(schemas, *, sheet=None)`
-
-複数のスキーマをまとめて変換します。
-
-```python
-def map_many(
-    self,
-    schemas: dict[str, Schema],
-    *,
-    sheet: str | int | None = None,
-) -> dict[str, dict]
-```
-
-**使用例:**
-
-```python
-result = mapper.map_many({
-    "customer": {"name": "顧客情報!B1", "id": "顧客情報!B2"},
-    "order": {"date": "注文情報!C1", "total": "注文情報!C5"},
-})
-# => {"customer": {"name": "...", "id": "..."}, "order": {"date": ..., "total": ...}}
-```
-
----
-
 ### `mapper.get_cell(cell_ref)`
 
 単一セルの値を直接取得します。
@@ -182,8 +157,14 @@ CellValue = Union[str, int, float, bool, datetime.datetime, None]
 Schema = Union[
     str,                        # セル参照 "B1", "Sheet1!A2"
     list[str],                  # 範囲参照 ["A1:A10"]
-    dict[str, "Schema"],        # ネストしたdict（または RangeSchema）
+    dict[str, "Schema"],        # ネストしたdict（または RangeSchema / CellObject）
 ]
+
+# セルオブジェクト形式（明示的なシート指定が可能）
+# {"cell": str}                       例: {"cell": "B1"}
+# {"cell": str, "sheet": str}         例: {"cell": "B1", "sheet": "Sheet2"}
+#
+# "sheet" キーは省略可。指定した場合は cell 内のシートプレフィックスより優先される。
 
 # レンジスキーマ（$range を含むdict）
 # {
@@ -253,9 +234,8 @@ except ExcelMapperError as e:
 
 ---
 
-## 依存ライブラリ（案）
+## 依存ライブラリ
 
 | ライブラリ | 用途 |
 |-----------|------|
 | `openpyxl` | `.xlsx` ファイルの読み込み |
-| `xlrd` | `.xls` ファイルの読み込み（オプション） |
