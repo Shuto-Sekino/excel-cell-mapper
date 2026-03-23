@@ -1,8 +1,8 @@
-# APIリファレンス
+# API Reference
 
-> ステータス: 下書き v0.1
+> Status: Draft v0.1
 
-## インストール
+## Installation
 
 ```bash
 pip install excel-cell-mapper
@@ -10,7 +10,7 @@ pip install excel-cell-mapper
 
 ---
 
-## 基本的な使い方
+## Basic Usage
 
 ```python
 from excel_cell_mapper import ExcelMapper
@@ -24,14 +24,14 @@ schema = {
 }
 
 result = mapper.map(schema)
-# => {"name": "山田太郎", "age": 30, "email": "yamada@example.com"}
+# => {"name": "Yamada Taro", "age": 30, "email": "yamada@example.com"}
 ```
 
 ---
 
-## `ExcelMapper` クラス
+## `ExcelMapper` Class
 
-### コンストラクタ
+### Constructor
 
 ```python
 ExcelMapper(
@@ -50,27 +50,27 @@ ExcelMapper(
 ExcelSource = str | Path | bytes | BinaryIO
 ```
 
-| 型 | 説明 |
-|----|------|
-| `str` | ファイルパス |
-| `pathlib.Path` | Pathオブジェクト |
-| `bytes` | バイナリデータ |
-| `BinaryIO` | ファイルオブジェクト（`open("file.xlsx", "rb")` など） |
+| Type | Description |
+|------|-------------|
+| `str` | File path |
+| `pathlib.Path` | Path object |
+| `bytes` | Binary data |
+| `BinaryIO` | File object (e.g., `open("file.xlsx", "rb")`) |
 
-#### オプション引数
+#### Optional Arguments
 
-| 引数 | 型 | デフォルト | 説明 |
-|------|----|------------|------|
-| `default_sheet` | `str \| int \| None` | `None` | デフォルトで参照するシート名またはインデックス（0始まり）。`None` の場合は最初のシートを使用 |
-| `empty_cell` | `"none" \| "omit" \| "empty"` | `"none"` | 空白セルの扱い。`"none"` は `None`、`"omit"` はキーを除外、`"empty"` は空文字列 `""` |
-| `date_format` | `"datetime" \| "iso" \| "local"` | `"datetime"` | 日付セルの変換方法。`"datetime"` は `datetime` オブジェクト、`"iso"` はISO 8601文字列 |
-| `transform` | `CellTransformer \| None` | `None` | セル値を変換するカスタムトランスフォーマー |
+| Argument | Type | Default | Description |
+|----------|------|---------|-------------|
+| `default_sheet` | `str \| int \| None` | `None` | Default sheet name or index (0-based) to reference. `None` uses the first sheet. |
+| `empty_cell` | `"none" \| "omit" \| "empty"` | `"none"` | How to handle empty cells. `"none"` returns `None`, `"omit"` excludes the key, `"empty"` returns an empty string `""`. |
+| `date_format` | `"datetime" \| "iso" \| "local"` | `"datetime"` | How to convert date cells. `"datetime"` returns a `datetime` object, `"iso"` returns an ISO 8601 string. |
+| `transform` | `CellTransformer \| None` | `None` | Custom transformer to process cell values. |
 
 ---
 
 ### `mapper.map(schema, *, sheet=None)`
 
-スキーマに基づいてExcelをdictに変換します。
+Converts an Excel file to a dict based on the schema.
 
 ```python
 def map(
@@ -81,22 +81,22 @@ def map(
 ) -> dict
 ```
 
-#### 引数
+#### Arguments
 
-| 引数 | 型 | 説明 |
-|------|----|------|
-| `schema` | `Schema` | マッピングスキーマ |
-| `sheet` | `str \| int \| None` | この呼び出し専用のシート指定。`default_sheet` を上書きする |
+| Argument | Type | Description |
+|----------|------|-------------|
+| `schema` | `Schema` | Mapping schema |
+| `sheet` | `str \| int \| None` | Sheet specification for this call only. Overrides `default_sheet`. |
 
-#### 戻り値
+#### Return Value
 
-`dict` — スキーマに従って変換されたdict
+`dict` — Dict converted according to the schema
 
 ---
 
 ### `mapper.get_cell(cell_ref)`
 
-単一セルの値を直接取得します。
+Retrieves the value of a single cell directly.
 
 ```python
 def get_cell(self, cell_ref: str) -> CellValue
@@ -104,14 +104,14 @@ def get_cell(self, cell_ref: str) -> CellValue
 
 ```python
 value = mapper.get_cell("Sheet1!B3")
-# => "山田太郎"
+# => "Yamada Taro"
 ```
 
 ---
 
 ### `mapper.get_range(range_ref)`
 
-セル範囲の値を2次元リストで取得します。
+Retrieves the values of a cell range as a 2D list.
 
 ```python
 def get_range(self, range_ref: str) -> list[list[CellValue]]
@@ -126,7 +126,7 @@ values = mapper.get_range("A1:C3")
 
 ### `mapper.get_sheet_names()`
 
-Excelファイル内のシート名一覧を取得します。
+Returns a list of sheet names in the Excel file.
 
 ```python
 def get_sheet_names(self) -> list[str]
@@ -134,9 +134,9 @@ def get_sheet_names(self) -> list[str]
 
 ---
 
-## コンテキストマネージャー対応
+## Context Manager Support
 
-`ExcelMapper` はコンテキストマネージャーとして使用できます。
+`ExcelMapper` can be used as a context manager.
 
 ```python
 with ExcelMapper("data.xlsx") as mapper:
@@ -145,39 +145,39 @@ with ExcelMapper("data.xlsx") as mapper:
 
 ---
 
-## 型定義
+## Type Definitions
 
 ```python
 from typing import Union
 
-# セル参照の値型
+# Cell value type
 CellValue = Union[str, int, float, bool, datetime.datetime, None]
 
-# スキーマ型（再帰的に定義）
+# Schema type (defined recursively)
 Schema = Union[
-    str,                        # セル参照 "B1", "Sheet1!A2"
-    list[str],                  # 範囲参照 ["A1:A10"]
-    dict[str, "Schema"],        # ネストしたdict（または RangeSchema / CellObject）
+    str,                        # Cell reference: "B1", "Sheet1!A2"
+    list[str],                  # Range reference: ["A1:A10"]
+    dict[str, "Schema"],        # Nested dict (or RangeSchema / CellObject)
 ]
 
-# セルオブジェクト形式（明示的なシート指定が可能）
-# {"cell": str}                       例: {"cell": "B1"}
-# {"cell": str, "sheet": str}         例: {"cell": "B1", "sheet": "Sheet2"}
+# Cell object syntax (allows explicit sheet specification)
+# {"cell": str}                       e.g., {"cell": "B1"}
+# {"cell": str, "sheet": str}         e.g., {"cell": "B1", "sheet": "Sheet2"}
 #
-# "sheet" キーは省略可。指定した場合は cell 内のシートプレフィックスより優先される。
+# The "sheet" key is optional. If specified, it takes precedence over any sheet prefix in "cell".
 
-# レンジスキーマ（$range を含むdict）
+# Range schema (dict containing $range)
 # {
 #     "$range": str,
 #     "$schema": dict[str, int],
-#     "$direction": Literal["row", "column"],  # デフォルト "row"
-#     "$skip_empty": bool,                     # デフォルト False
+#     "$direction": Literal["row", "column"],  # default: "row"
+#     "$skip_empty": bool,                     # default: False
 # }
 ```
 
 ---
 
-## カスタムトランスフォーマー
+## Custom Transformer
 
 ```python
 from excel_cell_mapper import CellContext
@@ -191,15 +191,15 @@ def my_transform(value: CellValue, context: CellContext) -> object:
 ```python
 @dataclass
 class CellContext:
-    cell_ref: str      # セル参照 "B1"
-    sheet_name: str    # シート名
-    col_index: int     # 列インデックス（0始まり）
-    row_index: int     # 行インデックス（0始まり）
+    cell_ref: str      # Cell reference, e.g., "B1"
+    sheet_name: str    # Sheet name
+    col_index: int     # Column index (0-based)
+    row_index: int     # Row index (0-based)
 ```
 
 ---
 
-## エラーハンドリング
+## Error Handling
 
 ```python
 from excel_cell_mapper import (
@@ -213,29 +213,29 @@ from excel_cell_mapper import (
 try:
     result = mapper.map(schema)
 except CellNotFoundError as e:
-    print(f"セル {e.cell_ref} が見つかりません")
+    print(f"Cell {e.cell_ref} not found")
 except SheetNotFoundError as e:
-    print(f"シート {e.sheet_name} が見つかりません")
+    print(f"Sheet {e.sheet_name} not found")
 except InvalidSchemaError as e:
-    print(f"スキーマが不正です: {e}")
+    print(f"Invalid schema: {e}")
 except ExcelMapperError as e:
-    print(f"マッパーエラー: {e}")
+    print(f"Mapper error: {e}")
 ```
 
-### エラークラス一覧
+### Error Classes
 
-| クラス | 継承元 | 説明 |
-|--------|--------|------|
-| `ExcelMapperError` | `Exception` | 基底エラークラス |
-| `CellNotFoundError` | `ExcelMapperError` | 指定したセルが存在しない。`cell_ref` 属性を持つ |
-| `SheetNotFoundError` | `ExcelMapperError` | 指定したシートが存在しない。`sheet_name` 属性を持つ |
-| `InvalidSchemaError` | `ExcelMapperError` | スキーマの記法が不正 |
-| `ParseError` | `ExcelMapperError` | Excelファイルのパースに失敗 |
+| Class | Inherits From | Description |
+|-------|---------------|-------------|
+| `ExcelMapperError` | `Exception` | Base error class |
+| `CellNotFoundError` | `ExcelMapperError` | The specified cell does not exist. Has a `cell_ref` attribute. |
+| `SheetNotFoundError` | `ExcelMapperError` | The specified sheet does not exist. Has a `sheet_name` attribute. |
+| `InvalidSchemaError` | `ExcelMapperError` | Invalid schema notation |
+| `ParseError` | `ExcelMapperError` | Failed to parse the Excel file |
 
 ---
 
-## 依存ライブラリ
+## Dependencies
 
-| ライブラリ | 用途 |
-|-----------|------|
-| `openpyxl` | `.xlsx` ファイルの読み込み |
+| Library | Purpose |
+|---------|---------|
+| `openpyxl` | Reading `.xlsx` files |

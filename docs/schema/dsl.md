@@ -1,59 +1,59 @@
-# スキーマDSL仕様
+# Schema DSL Specification
 
-> ステータス: 下書き v0.1
+> Status: Draft v0.1
 
-## 概要
+## Overview
 
-スキーマはPythonのdictで記述します。
-値にセル参照を書くことで、そのセルの値が結果のdictに展開されます。
-
----
-
-## セル参照の記法
-
-### 単一セル参照
-
-```
-"<列><行>"
-```
-
-| 例 | 説明 |
-|----|------|
-| `"A1"` | A列1行目 |
-| `"B3"` | B列3行目 |
-| `"AA10"` | AA列10行目 |
-
-### シート指定付きセル参照
-
-```
-"<シート名>!<列><行>"
-```
-
-| 例 | 説明 |
-|----|------|
-| `"Sheet2!A1"` | Sheet2のA列1行目 |
-| `"顧客情報!B5"` | 「顧客情報」シートのB列5行目 |
-
-### セル範囲参照（リスト用）
-
-```
-"<開始セル>:<終了セル>"
-```
-
-| 例 | 説明 |
-|----|------|
-| `"A1:A10"` | A列の1〜10行目（縦方向のリスト） |
-| `"A1:D1"` | A〜D列の1行目（横方向のリスト） |
-| `"A1:C3"` | A1からC3の2次元範囲 |
-| `"Sheet1!A1:A5"` | シート指定付き範囲 |
+Schemas are written as Python dicts.
+By writing cell references as values, the cell values are expanded into the resulting dict.
 
 ---
 
-## スキーマ記法
+## Cell Reference Notation
 
-### 1. 静的キー + セル参照（最も基本的な形）
+### Single Cell Reference
 
-dictのキー名を文字列で指定し、値にセル参照を指定します。
+```
+"<column><row>"
+```
+
+| Example | Description |
+|---------|-------------|
+| `"A1"` | Column A, Row 1 |
+| `"B3"` | Column B, Row 3 |
+| `"AA10"` | Column AA, Row 10 |
+
+### Cell Reference with Sheet Specification
+
+```
+"<sheet_name>!<column><row>"
+```
+
+| Example | Description |
+|---------|-------------|
+| `"Sheet2!A1"` | Column A, Row 1 of Sheet2 |
+| `"CustomerInfo!B5"` | Column B, Row 5 of the "CustomerInfo" sheet |
+
+### Cell Range Reference (for Lists)
+
+```
+"<start_cell>:<end_cell>"
+```
+
+| Example | Description |
+|---------|-------------|
+| `"A1:A10"` | Rows 1–10 of column A (vertical list) |
+| `"A1:D1"` | Row 1 of columns A–D (horizontal list) |
+| `"A1:C3"` | 2D range from A1 to C3 |
+| `"Sheet1!A1:A5"` | Range with sheet specification |
+
+---
+
+## Schema Notation
+
+### 1. Static Key + Cell Reference (Most Basic Form)
+
+Specify the dict key name as a string and the cell reference as the value.
 
 ```python
 schema = {
@@ -63,10 +63,10 @@ schema = {
 }
 ```
 
-**出力例:**
+**Example output:**
 ```python
 {
-    "name": "山田太郎",
+    "name": "Yamada Taro",
     "age": 30,
     "email": "yamada@example.com",
 }
@@ -74,9 +74,9 @@ schema = {
 
 ---
 
-### 2. 動的キー（セル参照 → セル参照）
+### 2. Dynamic Key (Cell Reference → Cell Reference)
 
-キーと値の両方をセル参照にすると、キーのセルの値をdictのキー名として使用します。
+When both the key and value are cell references, the value of the key cell is used as the dict key name.
 
 ```python
 schema = {
@@ -86,18 +86,18 @@ schema = {
 }
 ```
 
-Excelのデータ:
+Excel data:
 
 | | A | B |
 |-|---|---|
-| 1 | name | 山田太郎 |
+| 1 | name | Yamada Taro |
 | 2 | age | 30 |
 | 3 | email | yamada@example.com |
 
-**出力例:**
+**Example output:**
 ```python
 {
-    "name": "山田太郎",
+    "name": "Yamada Taro",
     "age": 30,
     "email": "yamada@example.com",
 }
@@ -105,9 +105,9 @@ Excelのデータ:
 
 ---
 
-### 3. ネストしたdict
+### 3. Nested Dict
 
-スキーマにdictをネストすることで、階層構造の結果を生成できます。
+Nesting dicts within the schema generates hierarchical results.
 
 ```python
 schema = {
@@ -124,13 +124,13 @@ schema = {
 }
 ```
 
-**出力例:**
+**Example output:**
 ```python
 {
-    "name": "山田太郎",
+    "name": "Yamada Taro",
     "address": {
-        "prefecture": "東京都",
-        "city": "渋谷区",
+        "prefecture": "Tokyo",
+        "city": "Shibuya",
         "zip": "150-0002",
     },
     "contact": {
@@ -142,9 +142,9 @@ schema = {
 
 ---
 
-### 4. リスト（セル範囲）
+### 4. List (Cell Range)
 
-値に範囲参照をリストとして指定すると、その範囲の値をリストに変換します。
+Specifying a range reference as a list in the value converts that range into a list.
 
 ```python
 schema = {
@@ -152,20 +152,20 @@ schema = {
 }
 ```
 
-**出力例:**
+**Example output:**
 ```python
 {
-    "items": ["りんご", "みかん", "ぶどう", "もも", "なし", "いちご"],
+    "items": ["Apple", "Orange", "Grape", "Peach", "Pear", "Strawberry"],
 }
 ```
 
-> `None` やブランクセルの扱いはオプションで制御可能（後述）
+> Handling of `None` and blank cells can be controlled via options (described later)
 
 ---
 
-### 5. dictのリスト（行・列のレンジ）
+### 5. List of Dicts (Row/Column Range)
 
-範囲の各行（または列）を1つのdictとしてマッピングする記法。
+Notation for mapping each row (or column) in a range to a single dict.
 
 ```python
 schema = {
@@ -180,99 +180,99 @@ schema = {
 }
 ```
 
-> `$range` に対象範囲、`$schema` に各列のインデックス（0始まり）とフィールド名のマッピングを指定します。
+> Specify the target range in `$range` and the mapping of column indices (0-based) to field names in `$schema`.
 
-**Excelのデータ:**
+**Excel data:**
 
 | A | B | C |
 |---|---|---|
 | id | name | price |
-| 1 | りんご | 100 |
-| 2 | みかん | 80 |
-| 3 | ぶどう | 200 |
+| 1 | Apple | 100 |
+| 2 | Orange | 80 |
+| 3 | Grape | 200 |
 
-**出力例:**
+**Example output:**
 ```python
 {
     "products": [
-        {"id": 1, "name": "りんご", "price": 100},
-        {"id": 2, "name": "みかん", "price": 80},
-        {"id": 3, "name": "ぶどう", "price": 200},
+        {"id": 1, "name": "Apple", "price": 100},
+        {"id": 2, "name": "Orange", "price": 80},
+        {"id": 3, "name": "Grape", "price": 200},
     ],
 }
 ```
 
 ---
 
-### 6. セルオブジェクト構文（明示的なシート指定）
+### 6. Cell Object Syntax (Explicit Sheet Specification)
 
-`{"cell": "...", "sheet": "..."}` 形式を使うと、セル参照とシート名を分けて指定できます。
+Using the `{"cell": "...", "sheet": "..."}` format allows you to specify the cell reference and sheet name separately.
 
 ```python
 schema = {
     "price": {"cell": "B3"},
-    "name":  {"cell": "A1", "sheet": "商品マスタ"},
+    "name":  {"cell": "A1", "sheet": "ProductMaster"},
 }
 ```
 
-| キー | 必須 | 説明 |
-|------|------|------|
-| `cell` | 必須 | セル参照（`"B1"` または `"Sheet1!B1"` 形式） |
-| `sheet` | 省略可 | シート名。指定した場合は `cell` 内のシートプレフィックスより優先 |
+| Key | Required | Description |
+|-----|----------|-------------|
+| `cell` | Required | Cell reference (`"B1"` or `"Sheet1!B1"` format) |
+| `sheet` | Optional | Sheet name. If specified, takes precedence over any sheet prefix in `cell`. |
 
-> 文字列形式でのシート指定（`"Sheet1!B1"`）と同等ですが、シート名を変数で渡しやすい場面で便利です。
+> Equivalent to string-based sheet specification (`"Sheet1!B1"`), but useful when you want to pass the sheet name as a variable.
 
 ---
 
-### 7. 複数シートにまたがるマッピング
+### 7. Mapping Across Multiple Sheets
 
-シート名を含むセル参照を使用することで、異なるシートの値を1つのdictにまとめられます。
+Using cell references that include sheet names allows values from different sheets to be combined into a single dict.
 
 ```python
 schema = {
     "customer": {
-        "name": "顧客情報!B1",
-        "id": "顧客情報!B2",
+        "name": "CustomerInfo!B1",
+        "id": "CustomerInfo!B2",
     },
     "order": {
-        "date": "注文情報!C1",
-        "total": "注文情報!C5",
+        "date": "OrderInfo!C1",
+        "total": "OrderInfo!C5",
     },
 }
 ```
 
 ---
 
-## 特殊ディレクティブ
+## Special Directives
 
-スキーマ内で `$` プレフィックスを持つキーは特殊ディレクティブとして扱います。
+Keys with the `$` prefix in a schema are treated as special directives.
 
-| ディレクティブ | 説明 |
-|---------------|------|
-| `$range` | 対象のセル範囲を指定 |
-| `$schema` | レンジ内の列/行マッピングを定義 |
-| `$direction` | レンジの走査方向（`"row"` \| `"column"`, デフォルト: `"row"`） |
-| `$skip_empty` | 空白セルの行/列をスキップするか（デフォルト: `False`） |
-
----
-
-## セル値の型変換
-
-Excelのセル値は以下のルールで自動的にPythonの型に変換されます。
-
-| Excelの型 | Python型 |
-|-----------|----------|
-| 数値（整数） | `int` |
-| 数値（小数） | `float` |
-| 文字列 | `str` |
-| 日付 | `datetime.datetime`（オプションで文字列形式も可） |
-| 真偽値 | `bool` |
-| 空白セル | `None`（オプションで省略も可） |
-| エラー値 | `None`（またはエラーハンドラで処理） |
+| Directive | Description |
+|-----------|-------------|
+| `$range` | Specifies the target cell range |
+| `$schema` | Defines the column/row mapping within the range |
+| `$direction` | Traversal direction of the range (`"row"` \| `"column"`, default: `"row"`) |
+| `$skip_empty` | Whether to skip rows/columns with empty cells (default: `False`) |
 
 ---
 
-## バリデーション（将来拡張）
+## Cell Value Type Conversion
+
+Excel cell values are automatically converted to Python types according to the following rules.
+
+| Excel Type | Python Type |
+|------------|-------------|
+| Number (integer) | `int` |
+| Number (decimal) | `float` |
+| String | `str` |
+| Date | `datetime.datetime` (can also be a string format via options) |
+| Boolean | `bool` |
+| Empty cell | `None` (can also be omitted via options) |
+| Error value | `None` (or handled by an error handler) |
+
+---
+
+## Validation (Future Extension)
 
 ```python
 schema = {
@@ -290,4 +290,4 @@ schema = {
 }
 ```
 
-> v0.1ではバリデーションはスコープ外。将来のバージョンで対応予定。
+> Validation is out of scope for v0.1. Planned for a future version.
