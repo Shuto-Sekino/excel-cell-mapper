@@ -1,21 +1,21 @@
-# 使用例・レシピ集
+# Usage Examples and Recipes
 
-> ステータス: 下書き v0.1
+> Status: Draft v0.1
 
 ---
 
-## 例1: シンプルなフォームの変換
+## Example 1: Simple Form Conversion
 
-**Excelレイアウト:**
+**Excel Layout:**
 
 | | A | B |
 |-|---|---|
-| 1 | 氏名 | 山田太郎 |
-| 2 | 年齢 | 30 |
-| 3 | メール | yamada@example.com |
-| 4 | 部署 | 営業部 |
+| 1 | Name | Yamada Taro |
+| 2 | Age | 30 |
+| 3 | Email | yamada@example.com |
+| 4 | Department | Sales |
 
-**スキーマ:**
+**Schema:**
 
 ```python
 from excel_cell_mapper import ExcelMapper
@@ -32,30 +32,30 @@ schema = {
 result = mapper.map(schema)
 ```
 
-**出力:**
+**Output:**
 
 ```python
 {
-    "name": "山田太郎",
+    "name": "Yamada Taro",
     "age": 30,
     "email": "yamada@example.com",
-    "department": "営業部",
+    "department": "Sales",
 }
 ```
 
 ---
 
-## 例2: 動的キー（ラベルと値が対になったExcel）
+## Example 2: Dynamic Keys (Excel with label-value pairs)
 
-**Excelレイアウト（A列がラベル、B列が値）:**
+**Excel Layout (Column A: labels, Column B: values):**
 
 | | A | B |
 |-|---|---|
-| 1 | name | 山田太郎 |
+| 1 | name | Yamada Taro |
 | 2 | age | 30 |
 | 3 | email | yamada@example.com |
 
-**スキーマ（A列のセル値をキーに使用）:**
+**Schema (using column A cell values as keys):**
 
 ```python
 schema = {
@@ -67,11 +67,11 @@ schema = {
 result = mapper.map(schema)
 ```
 
-**出力:**
+**Output:**
 
 ```python
 {
-    "name": "山田太郎",
+    "name": "Yamada Taro",
     "age": 30,
     "email": "yamada@example.com",
 }
@@ -79,19 +79,19 @@ result = mapper.map(schema)
 
 ---
 
-## 例3: ネストしたdict（住所情報）
+## Example 3: Nested Dict (Address Information)
 
-**Excelレイアウト:**
+**Excel Layout:**
 
 | | A | B |
 |-|---|---|
-| 1 | 氏名 | 山田太郎 |
-| 2 | 都道府県 | 東京都 |
-| 3 | 市区町村 | 渋谷区 |
-| 4 | 郵便番号 | 150-0002 |
-| 5 | 電話番号 | 03-1234-5678 |
+| 1 | Name | Yamada Taro |
+| 2 | Prefecture | Tokyo |
+| 3 | City | Shibuya |
+| 4 | Zip Code | 150-0002 |
+| 5 | Phone | 03-1234-5678 |
 
-**スキーマ:**
+**Schema:**
 
 ```python
 schema = {
@@ -107,14 +107,14 @@ schema = {
 result = mapper.map(schema)
 ```
 
-**出力:**
+**Output:**
 
 ```python
 {
-    "name": "山田太郎",
+    "name": "Yamada Taro",
     "address": {
-        "prefecture": "東京都",
-        "city": "渋谷区",
+        "prefecture": "Tokyo",
+        "city": "Shibuya",
         "zip": "150-0002",
     },
     "phone": "03-1234-5678",
@@ -123,19 +123,19 @@ result = mapper.map(schema)
 
 ---
 
-## 例4: リスト（品目一覧）
+## Example 4: List (Item List)
 
-**Excelレイアウト:**
+**Excel Layout:**
 
 | | A |
 |-|---|
-| 1 | りんご |
-| 2 | みかん |
-| 3 | ぶどう |
-| 4 | もも |
-| 5 | なし |
+| 1 | Apple |
+| 2 | Orange |
+| 3 | Grape |
+| 4 | Peach |
+| 5 | Pear |
 
-**スキーマ:**
+**Schema:**
 
 ```python
 schema = {
@@ -145,28 +145,28 @@ schema = {
 result = mapper.map(schema)
 ```
 
-**出力:**
+**Output:**
 
 ```python
 {
-    "fruits": ["りんご", "みかん", "ぶどう", "もも", "なし"],
+    "fruits": ["Apple", "Orange", "Grape", "Peach", "Pear"],
 }
 ```
 
 ---
 
-## 例5: dictのリスト（商品テーブル）
+## Example 5: List of Dicts (Product Table)
 
-**Excelレイアウト:**
+**Excel Layout:**
 
 | | A | B | C |
 |-|---|---|---|
 | 1 | id | name | price |
-| 2 | 1 | りんご | 100 |
-| 3 | 2 | みかん | 80 |
-| 4 | 3 | ぶどう | 200 |
+| 2 | 1 | Apple | 100 |
+| 3 | 2 | Orange | 80 |
+| 4 | 3 | Grape | 200 |
 
-**スキーマ（ヘッダー行を除いたA2:C4をdictのリストに変換）:**
+**Schema (converts A2:C4 excluding the header row into a list of dicts):**
 
 ```python
 schema = {
@@ -183,52 +183,52 @@ schema = {
 result = mapper.map(schema)
 ```
 
-**出力:**
+**Output:**
 
 ```python
 {
     "products": [
-        {"id": 1, "name": "りんご", "price": 100},
-        {"id": 2, "name": "みかん", "price": 80},
-        {"id": 3, "name": "ぶどう", "price": 200},
+        {"id": 1, "name": "Apple", "price": 100},
+        {"id": 2, "name": "Orange", "price": 80},
+        {"id": 3, "name": "Grape", "price": 200},
     ],
 }
 ```
 
 ---
 
-## 例6: 複数シートのデータを結合
+## Example 6: Merging Data from Multiple Sheets
 
-**Excelのシート構成:**
-- `顧客情報` シート: 顧客の基本データ
-- `注文情報` シート: 注文データ
+**Excel Sheet Structure:**
+- `CustomerInfo` sheet: Customer basic data
+- `OrderInfo` sheet: Order data
 
-**スキーマ:**
+**Schema:**
 
 ```python
 schema = {
     "customer": {
-        "id": "顧客情報!B1",
-        "name": "顧客情報!B2",
-        "email": "顧客情報!B3",
+        "id": "CustomerInfo!B1",
+        "name": "CustomerInfo!B2",
+        "email": "CustomerInfo!B3",
     },
     "order": {
-        "order_id": "注文情報!B1",
-        "date": "注文情報!B2",
-        "total": "注文情報!B5",
+        "order_id": "OrderInfo!B1",
+        "date": "OrderInfo!B2",
+        "total": "OrderInfo!B5",
     },
 }
 
 result = mapper.map(schema)
 ```
 
-**出力:**
+**Output:**
 
 ```python
 {
     "customer": {
         "id": "C-001",
-        "name": "山田太郎",
+        "name": "Yamada Taro",
         "email": "yamada@example.com",
     },
     "order": {
@@ -241,18 +241,18 @@ result = mapper.map(schema)
 
 ---
 
-## 例7: カスタムトランスフォーマー
+## Example 7: Custom Transformer
 
-セル値を取得後に加工したい場合はトランスフォーマーを使います。
+Use a transformer when you want to process cell values after retrieval.
 
 ```python
 from excel_cell_mapper import ExcelMapper, CellContext, CellValue
 
 def my_transform(value: CellValue, context: CellContext) -> object:
-    # 数値は小数点2桁に丸める
+    # Round floats to 2 decimal places
     if isinstance(value, float):
         return round(value, 2)
-    # 文字列は前後の空白を除去
+    # Strip whitespace from strings
     if isinstance(value, str):
         return value.strip()
     return value
@@ -263,7 +263,7 @@ result = mapper.map({"price": "B3"})
 
 ---
 
-## 例8: ファイルパスからの読み込み（典型的な使い方）
+## Example 8: Loading from File Path (Typical Usage)
 
 ```python
 from pathlib import Path
@@ -272,7 +272,7 @@ from excel_cell_mapper import ExcelMapper
 def process_order_form(file_path: str | Path) -> dict:
     mapper = ExcelMapper(
         file_path,
-        default_sheet="注文書",
+        default_sheet="OrderForm",
         empty_cell="omit",
         date_format="iso",
     )
@@ -297,7 +297,7 @@ def process_order_form(file_path: str | Path) -> dict:
 
 ---
 
-## 例9: コンテキストマネージャーとして使用
+## Example 9: Using as a Context Manager
 
 ```python
 from excel_cell_mapper import ExcelMapper
@@ -318,10 +318,10 @@ print(result)
 
 ---
 
-## 例10: バイナリデータからの読み込み（Web APIなど）
+## Example 10: Loading from Binary Data (Web API etc.)
 
 ```python
-# FastAPIでのアップロード処理例
+# Example upload handling with FastAPI
 from fastapi import UploadFile
 from excel_cell_mapper import ExcelMapper
 

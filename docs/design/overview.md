@@ -1,54 +1,54 @@
-# excel-cell-mapper 設計概要
+# excel-cell-mapper Design Overview
 
-## プロジェクト概要
+## Project Overview
 
-`excel-cell-mapper` は、Excelファイルをスキーマ（セルIDマッピング）に基づいてdictへ変換するPythonライブラリです。
-ユーザーはセルIDを使ったDSL（ドメイン固有言語）でマッピングを定義し、Excelの任意のセルの値を構造化されたdictに変換できます。
+`excel-cell-mapper` is a Python library that converts Excel files into dicts based on a schema (cell ID mapping).
+Users define mappings using a DSL (Domain-Specific Language) with cell IDs, and can extract values from arbitrary Excel cells into structured dicts.
 
-## 解決する課題
+## Problems Solved
 
-- Excelベースのデータ入力フォームをシステムに取り込む際の手動変換コストを削減する
-- セルの位置に依存した柔軟な構造化データ抽出を可能にする
-- ネストしたdictやリストなど複雑な構造もスキーマ定義だけで表現できる
+- Reduces the manual conversion cost of bringing Excel-based data entry forms into systems
+- Enables flexible structured data extraction based on cell positions
+- Allows complex structures such as nested dicts and lists to be expressed through schema definitions alone
 
-## コアコンセプト
+## Core Concepts
 
-### セルIDによるマッピング
+### Mapping by Cell ID
 
-Excelのセル参照（例: `A1`, `B3`, `Sheet2!C5`）をdictのフィールドにマッピングします。
+Maps Excel cell references (e.g., `A1`, `B3`, `Sheet2!C5`) to dict fields.
 
 ```
-Excel セル ──(schema)──▶ dict フィールド
+Excel cell ──(schema)──▶ dict field
 ```
 
-### スキーマ（Schema）
+### Schema
 
-スキーマはPythonのdictで記述します。
+Schemas are written as Python dicts.
 
-| 記法 | 説明 |
-|------|------|
-| `{ "fieldName": "B1" }` | 静的キー + セル参照 |
-| `{ "A1": "B1" }` | 動的キー（A1の値）+ セル参照（B1の値） |
-| `{ "fieldName": { ... } }` | ネストしたdict |
-| `{ "fieldName": ["A1:A10"] }` | セル範囲からリスト |
+| Notation | Description |
+|----------|-------------|
+| `{ "fieldName": "B1" }` | Static key + cell reference |
+| `{ "A1": "B1" }` | Dynamic key (value of A1) + cell reference (value of B1) |
+| `{ "fieldName": { ... } }` | Nested dict |
+| `{ "fieldName": ["A1:A10"] }` | List from cell range |
 
-## ドキュメント構成
+## Documentation Structure
 
 ```
 docs/
 ├── design/
-│   └── overview.md         # このファイル（設計概要）
+│   └── overview.md         # This file (design overview)
 ├── schema/
-│   └── dsl.md              # スキーマDSL仕様
+│   └── dsl.md              # Schema DSL specification
 ├── api/
-│   └── reference.md        # APIリファレンス
+│   └── reference.md        # API reference
 └── examples/
-    └── usage.md            # 使用例・レシピ集
+    └── usage.md            # Usage examples and recipes
 ```
 
-## 設計方針
+## Design Principles
 
-- **シンプル性**: 最小限のスキーマ定義でほとんどのユースケースに対応する
-- **Pythonic**: Pythonの慣習に沿ったAPI設計（型ヒント・dataclass・例外クラス）
-- **拡張性**: カスタムトランスフォーマーやバリデーターを追加できる
-- **シート対応**: 複数シートにまたがったマッピングをサポートする
+- **Simplicity**: Handles most use cases with minimal schema definitions
+- **Pythonic**: API design following Python conventions (type hints, dataclass, exception classes)
+- **Extensibility**: Supports adding custom transformers and validators
+- **Multi-sheet support**: Supports mappings spanning multiple sheets
